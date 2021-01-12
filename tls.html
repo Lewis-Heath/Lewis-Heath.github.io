@@ -1,0 +1,182 @@
+<!DOCTYPE HTML>
+<!--
+	Story by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Lewis Heath - The Last Stronghold</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper" class="divided">
+
+				<!-- One -->
+					<section class="banner style1 orient-right content-align-left image-position-left fullscreen onload-image-fade-in onload-content-fade-right" id="pic">
+						<div class="content">
+							<h1>The Last Stronghold</h1>
+							<p>The Last Stronghold is a tower defense, strategy-based game. The game is set in the near future where technology has advanced. However, the government got greedy and took Alien technology from another planet. This caused the aliens to attack Earth, destroying most civilization. But not all hope is lost, there is one settlement left – The Last Stronghold. The remaining people on the Earth must protect the last town! Using their own technology against them in the hope to survive the onslaught. Written in C# using Unity.</p>
+							<ul class="actions stacked">
+								<li><a href="#video" class="button small smooth-scroll-middle">Video</a> &nbsp <a href="#code" class="button small smooth-scroll-middle">Code highlights</a> &nbsp <a href="#feed" class="button small smooth-scroll-middle">Feedback</a> &nbsp <a href="#third" class="button small smooth-scroll-middle">Social media</a> &nbsp <a href="index.html" class="button small smooth-scroll-middle">Main menu</a></li>
+							</ul>
+						</div>
+						<div class="image">
+							<img src="images/TDBig.jpg" alt="" />
+						</div>
+					</section>
+
+				<!-- Two -->
+				<section class="wrapper style1 align-center" id="video">
+					<div class="inner large">
+						<h2>Video</h2>
+						<iframe width="1200" height="800" src="https://www.youtube.com/embed/e0bJhdg4ujc" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+						<br />
+						<br />
+						<br />
+						<p><a target="_blank" href="https://www.youtube.com/watch?v=e0bJhdg4ujc&t" target="_blank">Link to video</a></p>
+					</div>
+				</section>
+
+				<!-- Three -->
+				<section class="spotlight style1 orient-right content-align-left image-position-left onscroll-image-fade-in" id="code">
+					<div class="content">
+						<h2>Turret upgrade</h2>
+						<p>This is a simple function that is called once the user has pressed 'upgrade' on the selected turret. All the turrets modifiers are increased as well as its next upgrade cost and sell price. 'Mathf.FloorToInt' is used to convert the float to an integer so that decimals don't get inlvolved with the simple integer currency in the game.</p>
+					</div>
+					<div class = "content">
+						<pre><code>
+public void Upgrade()
+{
+	m_Level++;
+	m_FireRate *= 1.25f;
+	m_Damage *= 1.25f;
+	m_Range *= 1.25f;
+	float estimatedWorth = m_Worth * 2f;
+	m_Worth = Mathf.FloorToInt(estimatedWorth);
+	float estimatedUpgradeCost = m_UpgradeCost * 2.5f;
+	m_UpgradeCost = Mathf.FloorToInt(estimatedUpgradeCost);
+}
+</code></pre>
+					</div>
+				</section>
+
+
+
+				<!-- Four -->
+				<section class="spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in">
+					<div class="content">
+						<h2>Turret Rotation</h2>
+						<p>Using the targets position, the turrets position and quaternions, the turret can be rotated (around the attach point passed in) to look at the target. 'Quarternion.Lerp' sets the speed of the turret rotating each frame to make the rotating look more realistic.</p>
+					</div>
+					<div class = "content">
+						<pre><code>
+Vector3 direction = m_Target.position - transform.position;
+Quaternion lookRotation = Quaternion.LookRotation(direction);
+Vector3 rotation = Quaternion.Lerp(m_RotationPoint.rotation, lookRotation, Time.deltaTime * m_RotationSpeed).eulerAngles;
+m_RotationPoint.rotation = Quaternion.Euler(0f, rotation.y, rotation.z);
+</code></pre>
+					</div>
+				</section>
+
+				<!-- Fifth -->
+				<section class="spotlight style1 orient-right content-align-left image-position-left onscroll-image-fade-in">
+					<div class="content">
+						<h2>Target updating</h2>
+						<p>Finds the nearest target by getting every game object in the scene with the tag 'Enemy', placing them all in a list. It then loops through the list measuring each distance between turret and enemy. Sets the enemy with the smallest distance to the target.</p>
+					</div>
+					<div class = "content">
+						<pre><code>
+GameObject nearestEnemy = null;
+GameObject[] activeEnemies = GameObject.FindGameObjectsWithTag("Enemy");
+foreach (GameObject enemy in activeEnemies)
+{
+ if(!enemy.GetComponent<Enemy>().GetDying())
+ {
+  float distanceBetween = Vector3.Distance(transform.position, enemy.transform.position);
+  if (distanceBetween < shortestDistance)
+  {
+   shortestDistance = distanceBetween;
+   nearestEnemy = enemy;
+  }
+ }
+}
+				</code></pre>
+					</div>
+				</section>
+
+				<!-- Sixth -->
+				<section class="spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in">
+					<div class="content">
+						<h2>Rocket splash damage</h2>
+						<p>When a rocket reaches its target and explodes, using the 'Physcis.OverlapSphere' function it gets all game objects in that scene within the radius of the sphere and places it in a list. Then using some mathematics deals damage to the enemies near depedning on how far away they are - closer they are the more damage they take.</p>
+					</div>
+					<div class = "content">
+						<pre><code>
+private void SplashDamage()
+{
+ Collider[] objectsWithinExplosion = Physics.OverlapSphere(transform.position, 7.5f);
+ foreach (Collider nearbyObject in objectsWithinExplosion)
+ {
+  if(nearbyObject.gameObject.tag == "Enemy")
+  {
+   if(m_Target != nearbyObject.transform)
+   {
+    Vector3 middleOfEnemy = nearbyObject.transform.position;
+    middleOfEnemy.y += 2.2f;
+    Vector3 direction = middleOfEnemy - transform.position;
+    float distanceToTarget = direction.magnitude;
+    float distanceFromImpactToEnemy = distanceToTarget - 7.5f;
+    distanceFromImpactToEnemy = -distanceFromImpactToEnemy;
+    float damageMultiplier = distanceFromImpactToEnemy / 7.5f;
+    float damage = this.GetComponentInParent<Turret>().GetDamage() * damageMultiplier;
+    nearbyObject.GetComponent<Enemy>().TakeDamage(damage, ProjectileType.Rocket);
+   }
+  }
+ }
+}
+</code></pre>
+					</div>
+				</section>
+
+				<!-- Seventh -->
+				<section class="wrapper style1 align-center" id="feed">
+					<div class="inner large">
+						<h2>Feedback</h2>
+						<p>TBA</p>
+					</div>
+				</section>
+
+				<!-- Footer -->
+					<footer class="wrapper style1 align-center" id="third">
+						<div class="inner">
+							<ul class="icons">
+								<li><a href="https://www.linkedin.com/in/lewis-heath-a20820194/" target="_blank" class="icon brands style2 fa-linkedin-in"><span class="label">LinkedIn</span></a></li>
+								<li><a href="https://github.com/Lewis-Heath" target="_blank" class="icon brands style2 fa-github"><span class="label">GitHub</span></a></li>
+								<li><a href="https://twitter.com/Hewis_Leath07" target="_blank" class="icon brands style2 fa-twitter"><span class="label">Twitter</span></a></li>
+								<li><a href="https://www.instagram.com/lewis_heath/" target="_blank" class="icon brands style2 fa-instagram"><span class="label">Instagram</span></a></li>
+							</ul>
+							<ul class="actions stacked">
+								<li><a href="#pic" class="button big wide smooth-scroll-middle">Back to top</a> &nbsp <a href="index.html" class="button big wide smooth-scroll-middle">Main menu</a></li>
+							</ul>
+						</div>
+					</footer>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>

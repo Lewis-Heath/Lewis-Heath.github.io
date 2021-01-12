@@ -1,0 +1,174 @@
+<!DOCTYPE HTML>
+<!--
+	Story by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Lewis Heath - Shoot Fast!</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper" class="divided">
+
+				<!-- One -->
+					<section class="banner style1 orient-right content-align-left image-position-left fullscreen onload-image-fade-in onload-content-fade-right" id="pic">
+						<div class="content">
+							<h1>Shoot Fast!</h1>
+							<p>The aim of the game is in the name! Fight through an aim training facility as fast as you can, shoot the red people, avoid the green people. The player has two different weapons to choose from - AK47 and M107. In addition, 3 highly explosive grenades. However, accuracy counts; the higher your accuracy at the end, the more points you are rewarded. Written in C# using Unity.</p>
+							<ul class="actions stacked">
+								<li><a href="#video" class="button small smooth-scroll-middle">Video</a> &nbsp <a href="#code" class="button small smooth-scroll-middle">Code highlights</a> &nbsp <a href="#feed" class="button small smooth-scroll-middle">Feedback</a> &nbsp <a href="#third" class="button small smooth-scroll-middle">Social media</a> &nbsp <a href="index.html" class="button small smooth-scroll-middle">Main menu</a></li>
+							</ul>
+						</div>
+						<div class="image">
+							<img src="images/FPSBig.jpg" alt="" />
+						</div>
+					</section>
+
+				<!-- Two -->
+				<section class="wrapper style1 align-center" id="video">
+					<div class="inner large">
+						<h2>Video</h2>
+						<iframe width="1200" height="800" src="https://www.youtube.com/embed/VdX2Vp-q-NY" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+						<br />
+						<br />
+						<br />
+						<p><a target="_blank" href="https://www.youtube.com/watch?v=VdX2Vp-q-NY&t" target="_blank">Link to video</a></p>
+					</div>
+				</section>
+
+				<!-- Three -->
+				<section class="spotlight style1 orient-right content-align-left image-position-left onscroll-image-fade-in" id="code">
+					<div class="content">
+						<h2>Bullet Spread</h2>
+						<p>For bullet firing I used Raycasts. Before I call the 'Physics.Raycast' function I calculate the 'startPosition' and 'direction' for the raycast. The 'startPosition' is the cameras position and the 'direction' is the front face of the camera added with the offset angle. The angle depends on the current 'burst count' - the amount of bullets fired in that 'burst'. It takes the value from a 'm_SpreadAngles' list which contains a realistic recoil pattern.</p>
+					</div>
+					<div class = "content">
+						<pre><code>
+Vector2 spread = m_SpreadAngles[Mathf.Min(m_BurstCount, (m_SpreadAngles.Length - 1))];
+Transform camera = Camera.main.transform;
+Vector3 startPosition = camera.position;
+Vector3 direction = camera.forward;
+Vector3 offset = new Vector3(Mathf.Tan(spread.x), Mathf.Tan(spread.y), 0);
+direction += camera.InverseTransformDirection(offset);
+direction.Normalize();
+RaycastHit hit;
+if (Physics.Raycast(startPosition, direction, out hit, m_Range))
+ {
+  //Hit
+ }
+</code></pre>
+					</div>
+				</section>
+
+
+
+				<!-- Four -->
+				<section class="spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in">
+					<div class="content">
+						<h2>Mouse movement</h2>
+						<p>The mouse 'update' function is called every frame. It first takes the X and Y values of the mouse, adds is to the 'XRotation' as well as the current recoil of the gun. The values are limited and then the camera and player are rotated.</p>
+					</div>
+					<div class = "content">
+						<pre><code>
+void Update()
+{
+ float mouseX = Input.GetAxis("Mouse X") * m_Sensitivity * Time.deltaTime;
+ float mouseY = Input.GetAxis("Mouse Y") * m_Sensitivity * Time.deltaTime;
+ xRotation += -mouseY + xRecoil;
+ xRotation = Mathf.Clamp(xRotation, -90f, 90f);
+ transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+ m_PlayerBody.Rotate(Vector3.up * mouseX);
+}
+</code></pre>
+					</div>
+				</section>
+
+				<!-- Fifth -->
+				<section class="spotlight style1 orient-right content-align-left image-position-left onscroll-image-fade-in">
+					<div class="content">
+						<h2>Hit marker</h2>
+						<p>When the user fires and collides with an enemy a 'hit marker' game object is created. The parent is set to the canvas so it appears on the users screen correctly. If the enemy dies from that bullet the image colour is set to red, if not - the colour is set to white.</p>
+					</div>
+					<div class = "content">
+						<pre><code>
+if (m_HitMarkerGO != null)
+{
+ Destroy(m_HitMarkerGO.gameObject);
+}
+m_HitMarkerGO = (GameObject)Instantiate(m_HitMarker);
+m_HitMarkerGO.transform.SetParent(m_Canvas.transform);
+if(personType == "Enemy")
+{
+ if (hit.transform.gameObject.GetComponent<Enemy>().GetHealth() - damage <= 0)
+ {
+  m_HitMarkerGO.GetComponent<Image>().color = Color.red;
+ }
+ else
+ {
+  m_HitMarkerGO.GetComponent<Image>().color = Color.white;
+ }
+}
+				</code></pre>
+					</div>
+				</section>
+
+				<!-- Sixth -->
+				<section class="spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in">
+					<div class="content">
+						<h2>Grenade throwing</h2>
+						<p>When the function is called, the 'rigid body' component is referenced and a force is added to the grenade obeject in the scene. The 'AddForce' function takes in the vector direction and the 'ForceMode'.</p>
+					</div>
+					<div class = "content">
+						<pre><code>
+private void ThrowGrenade()
+{
+ Rigidbody rigidBody = GetComponent<Rigidbody>();
+ rigidBody.AddForce(transform.forward * m_ThrowForce, ForceMode.VelocityChange);
+}
+</code></pre>
+					</div>
+				</section>
+
+				<!-- Seventh -->
+				<section class="wrapper style1 align-center" id="feed">
+					<div class="inner large">
+						<h2>Feedback</h2>
+						<p>TBA</p>
+					</div>
+				</section>
+
+				<!-- Footer -->
+					<footer class="wrapper style1 align-center" id="third">
+						<div class="inner">
+							<ul class="icons">
+								<li><a href="https://www.linkedin.com/in/lewis-heath-a20820194/" target="_blank" class="icon brands style2 fa-linkedin-in"><span class="label">LinkedIn</span></a></li>
+								<li><a href="https://github.com/Lewis-Heath" target="_blank" class="icon brands style2 fa-github"><span class="label">GitHub</span></a></li>
+								<li><a href="https://twitter.com/Hewis_Leath07" target="_blank" class="icon brands style2 fa-twitter"><span class="label">Twitter</span></a></li>
+								<li><a href="https://www.instagram.com/lewis_heath/" target="_blank" class="icon brands style2 fa-instagram"><span class="label">Instagram</span></a></li>
+							</ul>
+							<ul class="actions stacked">
+								<li><a href="#pic" class="button big wide smooth-scroll-middle">Back to top</a> &nbsp <a href="index.html" class="button big wide smooth-scroll-middle">Main menu</a></li>
+							</ul>
+						</div>
+					</footer>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>

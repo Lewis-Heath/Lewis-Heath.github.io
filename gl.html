@@ -1,0 +1,279 @@
+<!DOCTYPE HTML>
+<!--
+	Story by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Lewis Heath - OpenGL Scene Renderer</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper" class="divided">
+
+				<!-- One -->
+					<section class="banner style1 orient-right content-align-left image-position-left fullscreen onload-image-fade-in onload-content-fade-right" id="pic">
+						<div class="content">
+							<h1>OpenGL Scene Renderer</h1>
+							<p>Using Gl, glm, glew, this project renders in various objects into different scenes. There are 2 scenes - both containing various realistic elements including light. In addition, there is an object editor where the user can change the rotation, scale and position of the object, as well as the texture and shape of the object.</p>
+							<ul class="actions stacked">
+								<li><a href="#video" class="button small smooth-scroll-middle">Video</a> &nbsp <a href="#code" class="button small smooth-scroll-middle">Code highlights</a> &nbsp <a href="#feed" class="button small smooth-scroll-middle">Feedback</a> &nbsp <a href="#third" class="button small smooth-scroll-middle">Social media</a> &nbsp <a href="index.html" class="button small smooth-scroll-middle">Main menu</a></li>
+							</ul>
+						</div>
+						<div class="image">
+							<img src="images/GLBig.jpg" alt="" />
+						</div>
+					</section>
+
+				<!-- Two -->
+				<section class="wrapper style1 align-center" id="video">
+					<div class="inner large">
+						<h2>Video</h2>
+						<iframe width="1200" height="800" src="https://www.youtube.com/embed/o6BPzaA0U_s" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+						<br />
+						<br />
+						<br />
+						<p><a target="_blank" href="https://www.youtube.com/watch?v=o6BPzaA0U_s&t" target="_blank">Link to video</a></p>
+					</div>
+				</section>
+
+				<!-- Three -->
+				<section class="spotlight style1 orient-right content-align-left image-position-left onscroll-image-fade-in" id="code">
+					<div class="content">
+						<h2>Camera movement</h2>
+						<p>Rotation around the side-to-side axis is the '_pitch' (y-direction in game), rotation around the vertical axis is called '_yaw' (x-direction in game). Using these values and some angular maths the camera is updated every frame to get smooth movement.</p>
+					</div>
+					<div class = "content">
+						<pre><code>
+void Camera::UpdateCameraVectors()
+{
+ _front.x = cos(radians(_yaw)) * cos(radians(_pitch));
+ _front.y = sin(radians(_pitch));
+ _front.z = sin(radians(_yaw)) * cos(radians(_pitch));
+ _front = normalize(_front);
+ _right = normalize( cross(_front, _worldUp));
+ _up = normalize( cross(_right, _front));
+}
+</code></pre>
+					</div>
+				</section>
+
+
+
+				<!-- Four -->
+				<section class="spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in">
+					<div class="content">
+						<h2>Window creation</h2>
+						<p>Function to create the game window. Includes various 'gl' and 'glfw' functions to se the paramaters and various elements of the game window.</p>
+					</div>
+					<div class = "content">
+						<pre><code>
+void Game::InitWindow(const char* title, GLboolean resizable)
+{
+ glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+ glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, GLMAJORVERSION);
+ glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, GLMINORVERSION);
+ glfwWindowHint(GLFW_RESIZABLE, resizable);
+ GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, title, NULL, NULL);
+ glfwGetFramebufferSize(window, &_frameBufferWidth, &_frameBufferHeight);
+ glViewport(0, 0, _frameBufferWidth, _frameBufferHeight);
+ glfwMakeContextCurrent(window);
+ _window = window;
+ if (_window == nullptr)
+ {
+  cout << "Window could not initialise" << endl;
+  glfwTerminate();
+ }
+}
+</code></pre>
+					</div>
+				</section>
+
+				<!-- Fifth -->
+				<section class="spotlight style1 orient-right content-align-left image-position-left onscroll-image-fade-in">
+					<div class="content">
+						<h2>Shader sending</h2>
+						<p>Using a function built in with 'gl', the user can send information to a shader file (.glsl) which can then be manipulated to produce a realisitc light effect using various equations. The equations use these values as well as other values passed in by the material - ambient, diffuse and specular. The final value calculated is then outputted and applied to the various scene objects.</p>
+					</div>
+					<div class = "content">
+						<pre><code>
+void Light::SendToShader(Shader& shader)
+{
+ shader.SetVector3f(_position, "light._position");
+ shader.Set1f(_intensity, "light._intensity");
+ shader.SetVector3f(_colour, "light._colour");
+}
+				</code></pre>
+					</div>
+				</section>
+
+				<!-- Sixth -->
+				<section class="spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in">
+					<div class="content">
+						<h2>Texture loading</h2>
+						<p>This function loads in a texture from a file using a 'SOIL' function. The texture paramaters are then set with a series of 'gl' functions. Next the mipmap is generated, the texture is binded and then the image data is cleared ready for the next texture to be loaded in.</p>
+					</div>
+					<div class = "content">
+						<pre><code>
+void Texture::LoadFromFile(const char* path)
+{
+ if (_texture)
+ {
+  glDeleteTextures(1, &_texture);
+ }
+ unsigned char* image = SOIL_load_image(path, &_width, &_height, NULL, SOIL_LOAD_RGBA);
+ glGenTextures(1, &_texture);
+ glBindTexture(_type, _texture);
+ glTexParameteri(_type, GL_TEXTURE_WRAP_S, GL_REPEAT);
+ glTexParameteri(_type, GL_TEXTURE_WRAP_T, GL_REPEAT);
+ glTexParameteri(_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+ glTexParameteri(_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+ if (image)
+ {
+  glTexImage2D(_type, 0, GL_RGBA, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+  glGenerateMipmap(GL_TEXTURE_2D);
+ }
+ else
+ {
+  cout << "Texture error could not load image: " << path << endl;
+ }
+ glActiveTexture(0);
+ glBindTexture(_type, 0);
+ SOIL_free_image_data(image);
+}
+</code></pre>
+					</div>
+				</section>
+
+				<!-- Seventh -->
+					<section class="wrapper style1 align-center" >
+						<div class="inner">
+							<h2>Feedback</h2>
+							<p>As it is a University assigment I recieved a mark for hitting certain criteria. Here is a breakdown of the marks;</p>
+							<div id="feed">
+							</div>
+							<div class="items style1 medium onscroll-fade-in">
+								<section>
+									<h3>3D Object from File</h3>
+									<h3><b>5/5</b></h3>
+									<p>Read in at least one scene object from file.</p>
+								</section>
+								<section>
+									<h3>Multiple Scene Objects</h3>
+									<h3><b>3/3</b></h3>
+									<p>Read in multiple different scene objects from file and store in an appropriate data structure.</p>
+								</section>
+								<section>
+									<h3>Rendering Scene Objects</h3>
+									<h3><b>5/5</b></h3>
+									<p>Render correctly with appropriate face winding, back face culling and depth testing enabled.</p>
+								</section>
+								<section>
+									<h3>HUD or Text Display</h3>
+									<h3><b>3/3</b></h3>
+									<p>Render some text to the screen, either for a menu system or in game data.</p>
+								</section>
+								<section>
+									<h3>Camera Movement</h3>
+									<h3><b>3/3</b></h3>
+									<p>Camera Movement in response to user input or an object tracking camera.</p>
+								</section>
+								<section>
+									<h3>Scene Object Movement</h3>
+									<h3><b>3/3</b></h3>
+									<p>Animation/Movement of scene objects without continuous user input.</p>
+								</section>
+								<section>
+									<h3>Scene Object Manipulation</h3>
+									<h3><b>4/5</b></h3>
+									<p>Can manipulate scene objects through user input.</p>
+								</section>
+								<section>
+									<h3>Basic Texturing</h3>
+									<h3><b>2/3</b></h3>
+									<p>At least one textured object. Can just be a cube.</p>
+								</section>
+								<section>
+									<h3>Advanced Texturing</h3>
+									<h3><b>5/5</b></h3>
+									<p>A flexible texturing implementation on complex objects.</p>
+								</section>
+								<section>
+									<h3>Materials and Lighting</h3>
+									<h3><b>5/6</b></h3>
+									<p>Implementation of Materials and Lighting on at least one scene object.</p>
+								</section>
+								<section>
+									<h3>Use standard file formats</h3>
+									<h3><b>6/6</b></h3>
+									<p>Read in and render 3D objects from standard file formats such as *.obj.</p>
+								</section>
+								<section>
+									<h3>Scene Graph</h3>
+									<h3><b>8/8</b></h3>
+									<p>Implementation and rendering of a hierarchical scene graph.</p>
+								</section>
+								<section>
+									<h3>Complexity</h3>
+									<h3><b>10/10</b></h3>
+									<p>Complexity and Inventiveness of scene.</p>
+								</section>
+								<section>
+									<h3>Programming Style</h3>
+									<h3><b>10/10</b></h3>
+									<p>Use of appropriate structures with clean, tidy and maintainable code.</p>
+								</section>
+								<section>
+									<h3>Gameplay</h3>
+									<h3><b>5/5</b></h3>
+									<p>Additional Gameplay elements.</p>
+								</section>
+								<section>
+									<h3>Report</h3>
+									<h3><b>11/18</b></h3>
+									<p>Written report on the project.</p>
+								</section>
+								<section>
+									<h3>Video</h3>
+									<h3><b>2/2</b></h3>
+									<p>A video capture of the game in action.</p>
+								</section>
+							</div>
+							<h2>Total: <b>91/100</b></h2>
+						</div>
+					</section>
+
+				<!-- Footer -->
+					<footer class="wrapper style1 align-center" id="third">
+						<div class="inner">
+							<ul class="icons">
+								<li><a href="https://www.linkedin.com/in/lewis-heath-a20820194/" target="_blank" class="icon brands style2 fa-linkedin-in"><span class="label">LinkedIn</span></a></li>
+								<li><a href="https://github.com/Lewis-Heath" target="_blank" class="icon brands style2 fa-github"><span class="label">GitHub</span></a></li>
+								<li><a href="https://twitter.com/Hewis_Leath07" target="_blank" class="icon brands style2 fa-twitter"><span class="label">Twitter</span></a></li>
+								<li><a href="https://www.instagram.com/lewis_heath/" target="_blank" class="icon brands style2 fa-instagram"><span class="label">Instagram</span></a></li>
+							</ul>
+							<ul class="actions stacked">
+								<li><a href="#pic" class="button big wide smooth-scroll-middle">Back to top</a> &nbsp <a href="index.html" class="button big wide smooth-scroll-middle">Main menu</a></li>
+							</ul>
+						</div>
+					</footer>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>

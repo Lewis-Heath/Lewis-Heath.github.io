@@ -1,0 +1,170 @@
+<!DOCTYPE HTML>
+<!--
+	Story by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Lewis Heath - Super Mario Bros</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper" class="divided">
+
+				<!-- One -->
+					<section class="banner style1 orient-right content-align-left image-position-left fullscreen onload-image-fade-in onload-content-fade-right" id="pic">
+						<div class="content">
+							<h1>Super Mario Bros</h1>
+							<p>Super Mario Bros is a 2D platformer game written in C++ using SDL 2.0. Just like the original, the aim of the game is for Mario and Luigi to reach the flag at the end of the map. However there are numerous enemies and obstacles in the way.</p>
+							<ul class="actions stacked">
+								<li><a href="#video" class="button small smooth-scroll-middle">Video</a> &nbsp <a href="#code" class="button small smooth-scroll-middle">Code highlights</a> &nbsp <a href="#feed" class="button small smooth-scroll-middle">Feedback</a> &nbsp <a href="#third" class="button small smooth-scroll-middle">Social media</a> &nbsp <a href="index.html" class="button small smooth-scroll-middle">Main menu</a></li>
+							</ul>
+						</div>
+						<div class="image">
+							<img src="images/SM.jpg" alt="" />
+						</div>
+					</section>
+
+				<!-- Two -->
+				<section class="wrapper style1 align-center" id="video">
+					<div class="inner large">
+						<h2>Video</h2>
+						<iframe width="1200" height="800" src="https://www.youtube.com/embed/QFXHFy_PRQM" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+						<br />
+						<br />
+						<br />
+						<p><a target="_blank" href="https://www.youtube.com/watch?v=QFXHFy_PRQM&t" target="_blank">Link to video</a></p>
+					</div>
+				</section>
+
+				<!-- Three -->
+				<section class="spotlight style1 orient-right content-align-left image-position-left onscroll-image-fade-in" id="code">
+					<div class="content">
+						<h2>Gravity</h2>
+						<p>Simple function that adds gravity to sprites not colliding with a platform (not on the ground). Function is calledd at each frame and adds a small amount in the Y direction (down).</p>
+					</div>
+					<div class = "content">
+						<pre><code>
+void AddGravity(float deltaTime)
+{
+ float increment;
+ increment = deltaTime * 25;
+ mPosition.y += increment;
+}
+</code></pre>
+					</div>
+				</section>
+
+
+
+				<!-- Four -->
+				<section class="spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in">
+					<div class="content">
+						<h2>Jumping</h2>
+						<p>If 'mJumping' is true the player moves up using the 'mJumpForce' times by 'deltaTime' for a smooth jump. The jump force slowly decreases over time to have a realsitic jumping effect.</p>
+					</div>
+					<div class = "content">
+						<pre><code>
+
+if (mJumping)
+{
+ mPosition.y -= mJumpForce * deltaTime ;
+ mJumpForce -= JUMP_FORCE_DECREMENT * deltaTime;
+}
+
+</code></pre>
+					</div>
+				</section>
+
+				<!-- Fifth -->
+				<section class="spotlight style1 orient-right content-align-left image-position-left onscroll-image-fade-in">
+					<div class="content">
+						<h2>Platform logic</h2>
+						<p>First the function calculates all the X and Y positions neccesary to know if the object is colliding with the floor / top of the brick. Then using some logic to set the variable to true if the bottom of the player is colliding with the top of the brick / floor and not exceeding the X coordinate bounds.</p>
+					</div>
+					<div class = "content">
+						<pre><code>
+void CheckOnPlatform(SDL_Rect BrickRect)
+{
+ int CharLeft = GetCollisionBox().x;
+ int BrickRight = BrickRect.x + BrickRect.w;
+ int CharRight = GetCollisionBox().x + GetCollisionBox().w;
+ int BrickLeft = BrickRect.x;
+ int CharBottom = GetCollisionBox().y + GetCollisionBox().h;
+ int BrickTop = BrickRect.y;
+ int CharTop = GetCollisionBox().y;
+ int BrickBottom = BrickRect.y + BrickRect.h;
+ if (CharBottom >= BrickTop && CharBottom < BrickBottom && mCollidingY && CharRight >= BrickLeft && CharLeft <= BrickRight)
+ {
+  mOnPlatform = true;
+ }
+}
+				</code></pre>
+					</div>
+				</section>
+
+				<!-- Sixth -->
+				<section class="spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in">
+					<div class="content">
+						<h2>Character animation</h2>
+						<p>Depending on the the current animation frame - 'mFrame' and the current state / size of the character - 'mSize' the image source rect changes accordingly. The size of the image rect also changes because the sprites becopme taller as they change form.</p>
+					</div>
+					<div class = "content">
+						<pre><code>
+if (mSize == "Small")
+ SetSourceRect(16 * mFrame, 0, 16, 16);
+if (mSize == "Medium")
+ SetSourceRect(16 * mFrame, 16, 16, 20);
+if (mSize == "Large")
+ SetSourceRect(16 * mFrame, 36, 16, 24);
+if (mSize == "Fire")
+ SetSourceRect(16 * mFrame, 60, 16, 24);
+</code></pre>
+					</div>
+				</section>
+
+				<!-- Seventh -->
+					<section class="wrapper style1 align-center" >
+						<div class="inner">
+							<h2>Feedback</h2>
+							<p>As it is a University assigment I recieved a mark for hitting certain criteria. Unfortantley I dont have the breakdown available.</p>
+							<div id="feed">
+							</div>
+							<h2>Final mark: <b>100%</b></h2>
+						</div>
+					</section>
+
+				<!-- Footer -->
+					<footer class="wrapper style1 align-center" id="third">
+						<div class="inner">
+							<ul class="icons">
+								<li><a href="https://www.linkedin.com/in/lewis-heath-a20820194/" target="_blank" class="icon brands style2 fa-linkedin-in"><span class="label">LinkedIn</span></a></li>
+								<li><a href="https://github.com/Lewis-Heath" target="_blank" class="icon brands style2 fa-github"><span class="label">GitHub</span></a></li>
+								<li><a href="https://twitter.com/Hewis_Leath07" target="_blank" class="icon brands style2 fa-twitter"><span class="label">Twitter</span></a></li>
+								<li><a href="https://www.instagram.com/lewis_heath/" target="_blank" class="icon brands style2 fa-instagram"><span class="label">Instagram</span></a></li>
+							</ul>
+							<ul class="actions stacked">
+								<li><a href="#pic" class="button big wide smooth-scroll-middle">Back to top</a> &nbsp <a href="index.html" class="button big wide smooth-scroll-middle">Main menu</a></li>
+							</ul>
+						</div>
+					</footer>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>

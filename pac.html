@@ -1,0 +1,234 @@
+<!DOCTYPE HTML>
+<!--
+	Story by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Lewis Heath - Pacman</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper" class="divided">
+
+				<!-- One -->
+					<section class="banner style1 orient-right content-align-left image-position-left fullscreen onload-image-fade-in onload-content-fade-right" id="pic">
+						<div class="content">
+							<h1>Pacman</h1>
+							<p>Pacman is a C++ project using S2D. It contains many of the feautres of the orignal Pacman game such as the ghosts, Pacman, Munchies, Cherries but also has a few of my own twists added to it. For example a Speed boost. The objective of the game is still the same - Collect all the munchies and don't die to the ghosts!</p>
+							<ul class="actions stacked">
+								<li><a href="#video" class="button small smooth-scroll-middle">Video</a> &nbsp <a href="#code" class="button small smooth-scroll-middle">Code highlights</a> &nbsp <a href="#feed" class="button small smooth-scroll-middle">Feedback</a> &nbsp <a href="#third" class="button small smooth-scroll-middle">Social media</a> &nbsp <a href="index.html" class="button small smooth-scroll-middle">Main menu</a></li>
+							</ul>
+						</div>
+						<div class="image">
+							<img src="images/PMBig.jpg" alt="" />
+						</div>
+					</section>
+
+				<!-- Two -->
+				<section class="wrapper style1 align-center" id="video">
+					<div class="inner large">
+						<h2>Video</h2>
+						<iframe width="1200" height="800" src="https://www.youtube.com/embed/ypnEX53n0Y8" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+						<br />
+						<br />
+						<br />
+						<p><a target="_blank" href="https://www.youtube.com/watch?v=ypnEX53n0Y8&t" target="_blank">Link to video</a></p>
+					</div>
+				</section>
+
+				<!-- Three -->
+				<section class="spotlight style1 orient-right content-align-left image-position-left onscroll-image-fade-in" id="code">
+					<div class="content">
+						<h2>Powerup munchies</h2>
+						<p>When the player collects a 'Powerup munchie' (gold munchie) it resets the 'ghostFrightTimer', 'frightCounter' and image 'sourcRect' (in the Y direction) for each ghost. Also activating the new texture and setting 'destructable' and 'ghostFright' to be true so when they are collided with they are destroyed.</p>
+					</div>
+					<div class = "content">
+						<pre><code>
+
+if (_munchies[i]->type == "Powerup")
+{
+ _menu->ghostFrightTimer = 0;
+ for (int i = 0; i < _menu->ghostCounter; i++)
+ {
+  _ghosts[i]->frightCounter = 0;
+  _ghosts[i]->sourceRect->Y = 0;
+  _ghosts[i]->texture = _menu->frightTexture;
+  _ghosts[i]->destructable = true;
+ }
+ _menu->ghostFright = true;
+}
+
+</code></pre>
+					</div>
+				</section>
+
+
+
+				<!-- Four -->
+				<section class="spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in">
+					<div class="content">
+						<h2>Wall Hitbox</h2>
+						<p>Calculate the position of each side of the wall using simple maths. The sides are then used in collision logic with various other sprites in the game.</p>
+					</div>
+					<div class = "content">
+						<pre><code>
+bottom = _walls[i]->Position->Y + _walls[i]->sourceRect->Height;
+left = _walls[i]->Position->X;
+right = _walls[i]->Position->X + _walls[i]->sourceRect->Width;
+top = _walls[i]->Position->Y;
+centerX = _walls[i]->Position->X + _walls[i]->sourceRect->Width / 2;
+centerY = _walls[i]->Position->Y + _walls[i]->sourceRect->Height / 2;
+</code></pre>
+					</div>
+				</section>
+
+				<!-- Fifth -->
+				<section class="spotlight style1 orient-right content-align-left image-position-left onscroll-image-fade-in">
+					<div class="content">
+						<h2>Sprite sheet</h2>
+						<p>A sprite sheet is a set of smaller images in one big image in a table like format. After each frame the sourceRectX is updated to implement a moving animation for Pacman. The sourceRectY is updated depending on the direction its moving so the image is changed to match the direction Pacman is moving.</p>
+					</div>
+					<div class = "content">
+						<pre><code>
+_pacman->SourceRect->X = _pacman->SourceRect->Width * _pacman->Frame;
+if (_pacman->Direction == 1)
+{
+ _pacman->SourceRect->Y = 96;
+}
+if (_pacman->Direction == 3)
+{
+ _pacman->SourceRect->Y = 64;
+}
+if (_pacman->Direction == 2)
+{
+ _pacman->SourceRect->Y = 32;
+}
+if (_pacman->Direction == 0)
+{
+ _pacman->SourceRect->Y = 128;
+}
+else
+{
+ _pacman->SourceRect->X = 0;
+}
+				</code></pre>
+					</div>
+				</section>
+
+				<!-- Sixth -->
+				<section class="spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in">
+					<div class="content">
+						<h2>Pause menu</h2>
+						<p>When the pause key is lifted it sets 'pKeyDown' to false. When the pause key is pressed and 'pKeyDown' is false it sets 'paused' boolean to opposite of the currenty state its in; if its unpaused, it pauses, and if paused, it unpauses. The 'pKeyDown' boolean is used to stop the menu flickering between states when the user is pressing the pause key.</p>
+					</div>
+					<div class = "content">
+						<pre><code>
+void Pacman::CheckPaused(Input::KeyboardState* state, Input::Keys pauseKey)
+{
+ if (state->IsKeyUp(pauseKey))
+ {
+  _menu->pKeyDown = false;
+ }
+ if (state->IsKeyDown(pauseKey) && !_menu->pKeyDown)
+ {
+  _menu->pKeyDown = true;
+  _menu->paused = !_menu->paused;
+ }
+}
+</code></pre>
+					</div>
+				</section>
+
+				<!-- Seventh -->
+					<section class="wrapper style1 align-center" >
+						<div class="inner">
+							<h2>Feedback</h2>
+							<p>As it is a University assigment I recieved a mark for hitting certain criteria. Here is a breakdown of the marks;</p>
+							<div id="feed">
+							</div>
+							<div class="items style1 medium onscroll-fade-in">
+								<section>
+									<h3>User Interaction & Collision Detection</h3>
+									<h3><b>8/8</b></h3>
+									<p>Skeleton code extended to enable Monster movement in all 4 directions using arrow keys or WASD. Monster confined to game board in all 4 directions or appropriate wrapping.</p>
+								</section>
+								<section>
+									<h3>Player Animation</h3>
+									<h3><b>12/12</b></h3>
+									<p>Player animation implemented so player faces the direction of movement and is animated.</p>
+								</section>
+								<section>
+									<h3>Sound</h3>
+									<h3><b>8/8</b></h3>
+									<p>Sounds play when in-game events occur. For example - sprite hits/wraps through a wall, collecting munchies, death etc.</p>
+								</section>
+								<section>
+									<h3>Multiple animated collectable items</h3>
+									<h3><b>12/12</b></h3>
+									<p>Different 2D images used for the collectible items. 2 or more items should be used and should be animated.</p>
+								</section>
+								<section>
+									<h3>Sprite animations</h3>
+									<h3><b>15/15</b></h3>
+									<p>Larger variety of sprites beyond the minimum requirements listed above. Walking / explosion animations.</p>
+								</section>
+								<section>
+									<h3>User & game interaction</h3>
+									<h3><b>20/20</b></h3>
+									<p>User interaction, feedback and sounds beyond the minimal application, responds to events such as collisions, gameplay and scoring.</p>
+								</section>
+								<section>
+									<h3>Other</h3>
+									<h3><b>20/20</b></h3>
+									<p>For example: * State machine * Other levels * High-score table.</p>
+								</section>
+								<section>
+									<h3>Report</h3>
+									<h3><b>2/3</b></h3>
+									<p>A brief description of the game concept with accompanying screenshots. Keyboard controls etc.</p>
+								</section>
+								<section>
+									<h3>Video</h3>
+									<h3><b>2/2</b></h3>
+									<p>A video capture of your game in action. Should highlight all features mentioned in the rubric.</p>
+								</section>
+							</div>
+							<h2>Total: <b>99/100</b></h2>
+						</div>
+					</section>
+
+				<!-- Footer -->
+					<footer class="wrapper style1 align-center" id="third">
+						<div class="inner">
+							<ul class="icons">
+								<li><a href="https://www.linkedin.com/in/lewis-heath-a20820194/" target="_blank" class="icon brands style2 fa-linkedin-in"><span class="label">LinkedIn</span></a></li>
+								<li><a href="https://github.com/Lewis-Heath" target="_blank" class="icon brands style2 fa-github"><span class="label">GitHub</span></a></li>
+								<li><a href="https://twitter.com/Hewis_Leath07" target="_blank" class="icon brands style2 fa-twitter"><span class="label">Twitter</span></a></li>
+								<li><a href="https://www.instagram.com/lewis_heath/" target="_blank" class="icon brands style2 fa-instagram"><span class="label">Instagram</span></a></li>
+							</ul>
+							<ul class="actions stacked">
+								<li><a href="#pic" class="button big wide smooth-scroll-middle">Back to top</a> &nbsp <a href="index.html" class="button big wide smooth-scroll-middle">Main menu</a></li>
+							</ul>
+						</div>
+					</footer>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
